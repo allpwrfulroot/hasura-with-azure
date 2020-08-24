@@ -1,0 +1,16 @@
+{
+  "name": "Hasura GraphQL Engine",
+  "description": "Blazing fast, instant realtime GraphQL APIs on Postgres with fine grained access control and webhook triggers for async business logic.",
+  "success_url": "/console",
+  "formation": {
+    "web": {
+      "quantity": 1
+    }
+  },
+  "stack": "container",
+  "addons": [
+    {
+      "plan": "heroku-postgresql:hobby-dev"
+    }
+  ]
+}
