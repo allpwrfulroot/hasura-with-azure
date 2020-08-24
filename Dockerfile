@@ -14,6 +14,6 @@ ENV HASURA_GRAPHQL_PG_CONNECTIONS=15
 # the primary postgres instance in your app
 CMD graphql-engine \
     --database-url $DATABASE_URL \
-    --admin-secret demoadminsecret \
     serve \
+    --admin-secret demoadminsecret \
     --server-port $PORT
