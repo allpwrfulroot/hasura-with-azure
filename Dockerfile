@@ -1,6 +1,6 @@
 FROM hasura/graphql-engine:pull3575-5762ee68
 
-# Enable the console
+# Enable the console. It should be disabled in production.
 ENV HASURA_GRAPHQL_ENABLE_CONSOLE=true
 
 # Enable debugging mode. It should be disabled in production.
@@ -15,5 +15,4 @@ ENV HASURA_GRAPHQL_PG_CONNECTIONS=15
 CMD graphql-engine \
     --database-url $DATABASE_URL \
     serve \
-    --admin-secret demoadminsecret \
     --server-port $PORT
