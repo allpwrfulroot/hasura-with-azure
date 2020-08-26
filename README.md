@@ -38,7 +38,11 @@ $ git push heroku master
 
 2. Make a few fake users and check that your users query works as expected
 
-3. Go to your new Heroku project and set the environment variable `HASURA_GRAPHQL_ADMIN_SECRET` (under Settings -> Config Vars). You'll have to use this admin secret to regain access to the Console
+3. Add "user" permissions, limiting access to non-admin queries to only those authenticated users who have session variable `x-hasura-user-id` that matches the user's id
+
+![screenshot of users permissions](/screenshots/hasura-user-permissions.png)
+
+3. Go to your new Heroku project and set the environment variable `HASURA_GRAPHQL_ADMIN_SECRET` (under Settings -> Config Vars). You'll then have to use this admin secret to regain access to the Console
 
 ### Set up Azure Functions
 
@@ -82,6 +86,8 @@ $ func start
 - Select `https://jwt.ms` as the reply url
 - Run! Sign up and see that a new user is created and a valid JWT provided
 
+![screenshot of valid token](/screenshots/initial-jwt.png)
+
 ### Modify your Azure AD B2C setup to include your custom claims
 
 1. Follow the instructions [from this tutorial](https://daniel-krzyczkowski.github.io/Azure-AD-B2C-With-External-Authorization-Store/) to modify your custom policies with custom claims
@@ -89,16 +95,17 @@ $ func start
 - See the demo custom policy files in this repo
 - Use the static-response version of your Azure function for now
 
-2. Test with "B2C_1A_signup_signin" again to verify that you're getting a valid JWT with the expected claims
+2. Test with "B2C_1A_signup_signin" again to verify that you're getting a valid JWT with the expected (static, fake) claims
 
-3. Update and re-deploy your Azure function with the actual business logic to provide the desired claims response. See 'getHasuraInfo.js' for an example that checks for an existing Hasura user with that Azure ID, creates a new one if Azure ID not found, and returns the role + user ID to be provided in the final claim.
+3. Update and re-deploy your Azure function with the actual business logic to provide the desired claims response. See 'getHasuraInfo.js' in this repo for an example that checks for an existing Hasura user with that Azure ID, creates a new one if Azure ID not found, and returns the role + user ID to be provided in the final claim.
 
 - Set up environment variables locally in `local.settings.json` under "values". Add the environment variables for prod via the Azure Portal: go to your Functions App, navigate to 'Configuration' (under 'Settings'), and add your environment variables as new application settings. Don't forget to save!
 - Check again that everything still starts locally as a sanity check before re-deploying the function
 
-4. Test again with "B2C_1A_signup_signin" again to verify that you're getting a valid JWT with the expected claims
+4. Test again with "B2C_1A_signup_signin" again to verify that you're getting a valid JWT with the expected claims and that a user is created in Hasura
 
 ![screenshot of valid token](/screenshots/final-custom-jwt.png)
+![screenshot of new user record](/screenshots/user-added-to-hasura.png)
 
 ### Update your Hasura instance to use Azure tokens
 
