@@ -4,6 +4,8 @@ See the presentation deck [here](https://docs.google.com/presentation/d/1qi-8ZvS
 
 [See the PR](https://github.com/hasura/graphql-engine/pull/3575) for additional info + preview updated docs
 
+NOTE: See the end of this document for notes on usage with Azure AD (for non-B2C tenants)
+
 #### Prerequisites
 
 - Azure account with subscription
@@ -122,3 +124,31 @@ $ func start
 3. Use the token via an Authorization header in the graphiql playground in the Hasura console. Check that you can query for users and get back only the one whose user ID matches the one in the token!
 
 ![screenshot of users query](/screenshots/final-authorized-query.png)
+
+## Using with Azure AD (not B2C)
+
+With Azure AD, you'll probably have a tenant with set users and groups (no arbitrary sign-ups). With this context, it'll probably make the most sense to
+
+1. Export the existing users from your Azure AD tenant
+2. Bulk import the user data into a `users` table in Hasura with the Azure AD objectId (idToken claim: `oid`) as the user id. Roles could be created from group id's or separately.
+
+Here is an example of JWT token claims (with group id's included):
+
+![screenshot of AD user id token](/screenshots/ad-token-claims.png)
+
+And here's an example of the JWT secret with the claims_map added:
+
+```
+{
+  "jwk_url": "https://login.windows.net/common/discovery/keys",
+  "claims_map": {
+    "x-hasura-allowed-roles": { "path": "$.groups" },
+    "x-hasura-default-role": { "path": "$.groups[0]" },
+    "x-hasura-user-id": { "path": "$.oid" }
+  }
+}
+```
+
+This maps the token's `oid` (Azure AD user id) and `groups` as Hasura user id's and roles, respectively. With this, you could do interesting permissions configurations such as per-group (now 'role') access controls.
+
+How to automatically update new/updated user info to your Postgres database, and how to architect key Hasura session variables like roles, group or team ID's, etc. is up to you!
